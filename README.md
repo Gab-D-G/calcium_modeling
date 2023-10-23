@@ -6,8 +6,8 @@ Multiple correction are made available (the design of which is customized with t
 
 1. Frame censoring (with FD, DVARS and/or GS)
 2. Detrending
-3. Removal of X first PCA components from the signal
-4. Highpass/lowpass filters (missing timepoints from censoring are handled through simulations as documented in the RABIES pipeline)
+3. Highpass/lowpass filters (missing timepoints from censoring are handled through simulations as documented in the RABIES pipeline)
+4. Removal of X first PCA components from the signal
 5. Regression of the global signal
 6. Image scaling
 7. Spatial smoothing

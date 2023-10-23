@@ -17,6 +17,12 @@ from modeling_functions import *
 parser = get_parser()
 opts = parser.parse_args()
 
+args = 'CLI INPUTS: \n'
+for arg in vars(opts):
+    input = f'-> {arg} = {getattr(opts, arg)} \n'
+    args += input
+print(args)
+
 out_dir = opts.output_dir
 if not os.path.isdir(out_dir):
     raise ValueError(f"{out_dir} from --output_dir does not exist.")

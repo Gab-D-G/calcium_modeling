@@ -86,11 +86,7 @@ def regress_calcium(timeseries, calcium_file, brain_mask_file, cleaned_path, FD_
     voxelwise_mean = timeseries_.mean(axis=0)
 
     timeseries = remove_trend(timeseries, frame_mask, second_order=second_order, keep_intercept=False)
-    confounds_array_mot6 = remove_trend(confounds_array_mot6, frame_mask, second_order=second_order, keep_intercept=False)
-    
-    if n_pca_regress>0:
-        timeseries = pca_regress(timeseries, n_components=n_pca_regress)
-    
+    confounds_array_mot6 = remove_trend(confounds_array_mot6, frame_mask, second_order=second_order, keep_intercept=False)    
 
     if (not highpass is None) or (not lowpass is None):
         '''
@@ -135,14 +131,20 @@ def regress_calcium(timeseries, calcium_file, brain_mask_file, cleaned_path, FD_
     if frame_mask.sum()<int(minimum_timepoint):
         return 
 
-        
-    '''
-    #9 - Apply confound regression using the selected nuisance regressors.
-    '''
+
     # voxels that have a NaN value are set to 0
     nan_voxels = np.isnan(timeseries).sum(axis=0)>1
     timeseries[:,nan_voxels] = 0
     
+    '''
+    ### - Regress principal components
+    '''
+    if n_pca_regress>0:
+        timeseries = pca_regress(timeseries, n_components=n_pca_regress)
+
+    '''
+    #9 - Apply confound regression using the selected nuisance regressors.
+    '''    
 
     # always apply GSR for CR estimates
     confounds_array=timeseries.mean(axis=1).reshape(-1,1)
