@@ -121,7 +121,7 @@ if (not opts.confounds_file is None) and (not opts.FD_file is None):
     the calcium modality, which contains {num_frame_calcium} frames.")
 
 
-    if (not num_frame_calcium==num_frame_BOLD*upsampling_ratio) and (not crop_BOLD_upsampled is None):
+    if (not num_frame_calcium==num_frame_BOLD*upsampling_ratio) and (crop_BOLD_upsampled is None):
         raise ValueError("The length of the calcium and upsampled BOLD timecourses do not match. Consider using crop_BOLD_upsampled to manually crop the BOLD timeseries.")
 
     confounds_array_mot6 = np.repeat(confounds_array_mot6_BOLD,upsampling_ratio, axis=0)
