@@ -73,7 +73,7 @@ def get_parser():
         '--crop_BOLD_upsampled', type=str, default=None,
         help=
             "With this option, can crop the motion parameters after upsampling if they don't match the calcium dimensions. \n"
-            "e.g. '0,80' for timepoint 0 to 80.\n"
+            "e.g. '0,80' for timepoint 0 to 80. NOTE THAT THE FRAMES ARE DENOTED BASED ON THE CALCIUM RESOLUTION, NOT BOLD.\n"
             "(default: %(default)s)\n"
             "\n"
         )

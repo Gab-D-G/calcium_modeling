@@ -117,9 +117,8 @@ if (not opts.confounds_file is None) and (not opts.FD_file is None):
 
     upsampling_ratio = int(opts.BOLD_TR/opts.calcium_TR)
 
-    print(f"The BOLD-derived motion timecourse will be upsampled by {upsampling_ratio} from {num_frame_BOLD} frames to {num_frame_BOLD*upsampling_ratio} frames to match \
-    the calcium modality, which contains {num_frame_calcium} frames.")
-
+    print(f"The BOLD-derived motion timecourse will be upsampled by {upsampling_ratio} from {num_frame_BOLD} frames to {num_frame_BOLD*upsampling_ratio} frames to match "
+    f"the calcium modality, which contains {num_frame_calcium} frames.")
 
     if (not num_frame_calcium==num_frame_BOLD*upsampling_ratio) and (crop_BOLD_upsampled is None):
         raise ValueError("The length of the calcium and upsampled BOLD timecourses do not match. Consider using crop_BOLD_upsampled to manually crop the BOLD timeseries.")
