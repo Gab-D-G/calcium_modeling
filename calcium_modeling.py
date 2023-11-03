@@ -197,7 +197,7 @@ if not opts.seed_file is None:
 
     # extract the voxel timeseries within the mask, and take the mean ROI timeseries
     seed_timeseries = timeseries[:,roi_mask].mean(axis=1)
-    seed_timeseries /= np.sqrt((seed_timeseries ** 2).sum(axis=0)) # the temporal domain is variance-normalized so that the weights are contained in the spatial maps
+    seed_timeseries /= np.sqrt((seed_timeseries ** 2).mean(axis=0)) # the temporal domain is variance-normalized so that the weights are contained in the spatial maps
     seed_corrs = vcorrcoef(timeseries.T, seed_timeseries)
     seed_corrs[np.isnan(seed_corrs)] = 0
 
