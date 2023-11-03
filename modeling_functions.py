@@ -342,7 +342,6 @@ def process_data(timeseries,VE_spatial,temporal_std,predicted_std,CR_data_dict):
 
 
 import nilearn.plotting
-from rabies.visualization import plot_3d,otsu_scaling
 
 def plot_2d(ax,sitk_img,fig,vmin=0,vmax=1,cmap='gray', alpha=1, cbar=False, threshold=None):
     physical_dimensions = (np.array(sitk_img.GetSpacing())*np.array(sitk_img.GetSize()))[::-1] # invert because the array is inverted indices
@@ -493,7 +492,7 @@ def scan_diagnosis_calcium(timeseries, mask_file, template_file, CR_data_dict, s
     fig2, axes2 = plt.subplots(nrows=nrows, ncols=1, figsize=(4, 4*nrows))
     plt.tight_layout()
 
-    scaled = otsu_scaling(template_file)
+    scaled = template_scaling(template_file, mask_file)
     
     ax = axes2[0]
     cbar = plot_2d(ax,scaled,fig2,vmin=0,vmax=1.2,cmap='gray', alpha=1, cbar=False, threshold=None)
@@ -576,3 +575,21 @@ def scan_diagnosis_calcium(timeseries, mask_file, template_file, CR_data_dict, s
         ax.set_title(name, fontsize=30, color='white')
 
     return fig, fig2
+
+
+def template_scaling(image_file, mask_file):
+    img = sitk.ReadImage(image_file)
+    array = sitk.GetArrayFromImage(img)
+
+    mask_img = sitk.ReadImage(mask_file)
+    volume_idx = sitk.GetArrayFromImage(mask_img).astype(bool)
+
+    voxel_subset=array[volume_idx]
+    # select a maximal value which encompasses 90% of the voxels in the mask
+    voxel_subset.sort()
+    vmax=voxel_subset[int(len(voxel_subset)*0.90)]
+
+    scaled = array/vmax
+    scaled_img=sitk.GetImageFromArray(scaled, isVector=False)
+    scaled_img.CopyInformation(img)
+    return scaled_img
