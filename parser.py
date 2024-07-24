@@ -199,15 +199,53 @@ def get_parser():
             "(default: %(default)s)\n"
             "\n"
         )
-
     analysis.add_argument(
-        '--optimize_NPR', type=str,
-        default='apply=false,window_size=5,min_prior_corr=0.5,diff_thresh=0.03,max_iter=20,compute_max=false',
+        '--CPCA_temporal_comp', type=int, default=-1,
         help=
-            "This option handles NPR, as documented on the RABIES pipeline. See RABIES documentation for details. \n"
+            "Option for performing Complementary Principal Component Analysis (CPCA). Specify with this option how many extra \n"
+            "subject-specific sources will be computed to account for non-prior confounds. This options \n"
+            "specifies the number of temporal components to compute. After computing \n"
+            "these sources, CPCA will provide a fit for each prior in --prior_maps indexed by --prior_bold_idx.\n"
+            "Specify at least 0 extra sources to run CPCA.\n"
             "(default: %(default)s)\n"
             "\n"
         )
-
+    analysis.add_argument(
+        '--CPCA_spatial_comp', type=int, default=-1,
+        help=
+            "Same as --CPCA_temporal_comp, but specify how many spatial components to compute (which are \n"
+            "additioned to the temporal components).\n"
+            "(default: %(default)s)\n"
+            "\n"
+        )
+    analysis.add_argument(
+        '--optimize_CPCA', type=str,
+        default='apply=false,min_prior_corr=0.5,diff_thresh_t=0.03,diff_thresh_s=0.03',
+        help=
+            "This option handles the automated dimensionality estimation when carrying out CPCA. The number of \n"
+            "components specified with --CPCA_temporal_comp and --CPCA_spatial_comp will be first derived, and \n"
+            "then an ideal dimensionality will be selected for temporal components and then for spatial \n"
+            "components. A convergence report is generated to visualize the results across iterations. \n"
+            "\n"
+            "Convergence criterion 1: A The correlation between the fitted network component \n"
+            "and the prior must reach a minimum.\n"
+            "\n"
+            "Convergence criterion 2: The last CPCA component which generated a sufficient difference in the output \n"
+            "fitted network is selected. \n"
+            "\n"
+            "When multiple priors are fitted, the minimum dimensionality for all networks to respect the convergence \n"
+            "criteria is selected.\n"
+            "\n"
+            "* apply: select 'true' to apply this option.\n"
+            "*** Specify 'true' or 'false'. \n"
+            "* min_prior_corr: Threshold for criterion 1. \n"
+            "*** Must provide a float. \n"
+            "* diff_thresh_t: Threshold for criterion 2 for temporal components. \n"
+            "*** Must provide a float. \n"
+            "* diff_thresh_s: Threshold for criterion 2 for spatial components. \n"
+            "*** Must provide a float. \n"
+            "(default: %(default)s)\n"
+            "\n"
+        )
     return parser
 

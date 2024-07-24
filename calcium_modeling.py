@@ -37,12 +37,14 @@ from rabies.parser import parse_argument
 frame_censoring = parse_argument(opt=opts.frame_censoring, 
     key_value_pairs = {'FD_censoring':['true', 'false'], 'FD_threshold':float, 'DVARS_censoring':['true', 'false'],
         'GS_censoring':['true', 'false'], 'minimum_timepoint':int},
+    defaults = {'FD_censoring':False,'FD_threshold':0.05,'DVARS_censoring':False,'GS_censoring':False,'minimum_timepoint':3},
     name='frame_censoring')
 
-optimize_NPR = parse_argument(opt=opts.optimize_NPR, 
-    key_value_pairs = {'apply':['true', 'false'], 'window_size':int, 'min_prior_corr':float,
-                        'diff_thresh':float, 'max_iter':int, 'compute_max':['true', 'false']},
-    name='optimize_NPR')
+optimize_CPCA_dict = parse_argument(opt=opts.optimize_CPCA, 
+    key_value_pairs = {'apply':['true', 'false'], 'min_prior_corr':float,
+                        'diff_thresh_t':float, 'diff_thresh_s':float},
+    defaults = {'apply':False,'min_prior_corr':0.5,'diff_thresh_t':0.03,'diff_thresh_s':0.03},
+    name='optimize_CPCA')
 
 #######################################
 
@@ -217,24 +219,32 @@ if not opts.IC_file is None:
     analysis_dict['DR']['FC_maps'] = (DR_full['C'][:,opts.IC_network_idx]*DR_full['S'][opts.IC_network_idx]).T
 
 
-    if optimize_NPR['apply']:
-        from rabies.analysis_pkg.analysis_functions import spatiotemporal_fit_converge
+
+    CPCA_temporal_comp = opts.CPCA_temporal_comp
+    CPCA_spatial_comp = opts.CPCA_spatial_comp
+    if CPCA_temporal_comp>-1 or CPCA_spatial_comp>-1: # CPCA is run if at least 0 components is inputed
+        if CPCA_temporal_comp<1: # make sure there is no negative number
+            CPCA_temporal_comp=0
+        if CPCA_spatial_comp<1: # make sure there is no negative number
+            CPCA_spatial_comp=0
+        from rabies.analysis_pkg.CPCA import spatiotemporal_CPCA
         C_prior = calcium_ICs[opts.IC_network_idx,:].T
-        modeling,_,_,_,optimize_report_fig = spatiotemporal_fit_converge(timeseries,C_prior,
-                                window_size=optimize_NPR['window_size'],
-                                min_prior_corr=optimize_NPR['min_prior_corr'],
-                                diff_thresh=optimize_NPR['diff_thresh'],
-                                max_iter=optimize_NPR['max_iter'], 
-                                compute_max=optimize_NPR['compute_max'], 
-                                gen_report=True)
+        modeling, Ct_extra, Cs_extra, optimize_report_fig = spatiotemporal_CPCA(timeseries, C_prior, 
+                                                                num_W=CPCA_temporal_comp, 
+                                                                num_C=CPCA_spatial_comp, 
+                                                                optim_dim=optimize_CPCA_dict['apply'],
+                                                                min_prior_corr=optimize_CPCA_dict['min_prior_corr'], 
+                                                                diff_thresh_t=optimize_CPCA_dict['diff_thresh_t'], 
+                                                                diff_thresh_s=optimize_CPCA_dict['diff_thresh_s']) 
         
-        optimize_report_file = os.path.abspath(f'{out_dir}/{filename_split[0]}_NPR_optimize.png')
-        optimize_report_fig.savefig(optimize_report_file, bbox_inches='tight')
+        if optimize_CPCA_dict['apply']:
+            optimize_report_file = os.path.abspath(f'{out_dir}/{filename_split[0]}_CPCA_optimize.png')
+            optimize_report_fig.savefig(optimize_report_file, bbox_inches='tight')
 
         C_fit = modeling['C_fitted_prior']*modeling['S_fitted_prior']
-        analysis_dict['NPR']={}
-        analysis_dict['NPR']['signal_trace'] = modeling['W_fitted_prior']
-        analysis_dict['NPR']['FC_maps'] = C_fit.T
+        analysis_dict['CPCA']={}
+        analysis_dict['CPCA']['signal_trace'] = modeling['W_fitted_prior']
+        analysis_dict['CPCA']['FC_maps'] = C_fit.T
 
 '''
 spatiotemporal diagnosis
