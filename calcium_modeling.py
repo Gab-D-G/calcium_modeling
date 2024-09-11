@@ -43,7 +43,7 @@ frame_censoring = parse_argument(opt=opts.frame_censoring,
 optimize_CPCA_dict = parse_argument(opt=opts.optimize_CPCA, 
     key_value_pairs = {'apply':['true', 'false'], 'min_prior_corr':float,
                         'diff_thresh_t':float, 'diff_thresh_s':float},
-    defaults = {'apply':False,'min_prior_corr':0.5,'diff_thresh_t':0.03,'diff_thresh_s':0.03},
+    defaults = {'apply':False,'min_prior_corr':0.5,'diff_thresh_t':0.05,'diff_thresh_s':0.03},
     name='optimize_CPCA')
 
 #######################################
